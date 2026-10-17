@@ -1,0 +1,1605 @@
+/* ==========================================================
+   FOLIO — Cinematic workspace
+   ========================================================== */
+
+/* ==========================================================
+   01. VARIABLES Y CONFIGURACIÓN GLOBAL
+   ========================================================== */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #0b1114;
+  --ink: #d7ddd8;
+  --ink-dim: #9aa7a1;
+  --ink-mute: #71807a;
+
+  --line: rgba(186, 210, 204, 0.14);
+  --line-strong: rgba(186, 210, 204, 0.28);
+
+  --glass: rgba(10, 16, 20, 0.82);
+  --glass-soft: rgba(14, 22, 26, 0.74);
+  --field: rgba(5, 11, 14, 0.58);
+
+  --olive: #849372;
+  --olive-deep: #4e5c43;
+  --olive-fill: rgba(90, 104, 72, 0.38);
+
+  --cyan: #7aa0a8;
+  --mark: rgba(133, 157, 103, 0.28);
+  --mark-on: rgba(176, 194, 132, 0.48);
+
+  --radius: 9px;
+
+  --font-ui: "Rajdhani", "Segoe UI", sans-serif;
+  --font-text: "Source Sans 3", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
+
+  --zoom: 1;
+  --gap: 12px;
+  --header-height: 58px;
+}
+
+/* ==========================================================
+   02. RESET, DOCUMENTO Y ESTILOS BASE
+   ========================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: #070b0d;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  height: 100%;
+  min-width: 320px;
+  margin: 0;
+  overflow: hidden;
+
+  color: var(--ink);
+  background-color: #0b1114;
+  background-image:
+    linear-gradient(rgba(7, 12, 15, 0.48), rgba(7, 12, 15, 0.68)),
+    url("assets/landscape.jpg");
+  background-position:
+    center,
+    center 32%;
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.45;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fondo ambiental. */
+body::before {
+  position: fixed;
+  z-index: -2;
+  top: 0;
+  right: auto;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+
+  content: "";
+
+  background-color: #101a1e;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(5, 10, 13, 0.3) 0%,
+      rgba(5, 10, 13, 0.28) 30%,
+      rgba(5, 10, 13, 0.68) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(5, 10, 13, 0.55) 0%,
+      rgba(5, 10, 13, 0.12) 52%,
+      rgba(5, 10, 13, 0.48) 100%
+    ),
+    url("./assets/landscape.jpg");
+
+  background-position:
+    center,
+    center,
+    center 32%;
+  background-size: cover, cover, cover;
+  background-repeat: no-repeat;
+
+  filter: saturate(0.78) contrast(1.04);
+  transform: translateZ(0);
+  pointer-events: none;
+}
+
+body::after {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+
+  content: "";
+
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(53, 81, 91, 0.12), transparent 52%),
+    linear-gradient(180deg, transparent 55%, rgba(3, 7, 9, 0.3));
+
+  pointer-events: none;
+}
+
+/* Tipografía heredada por los controles. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Foco accesible mediante teclado. */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 1px solid rgba(154, 186, 176, 0.72);
+  outline-offset: 2px;
+}
+
+::selection {
+  color: #f3f6f2;
+  background: rgba(90, 130, 140, 0.45);
+}
+
+/* Respeta los controles ocultos por HTML o JavaScript. */
+[hidden] {
+  display: none !important;
+}
+
+/* Barras de desplazamiento. */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: rgba(110, 130, 128, 0.35);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(140, 166, 158, 0.52);
+  background-clip: padding-box;
+}
+
+/* ==========================================================
+   03. CABECERA Y MARCA
+   ========================================================== */
+
+.barra-superior {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  width: 100%;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  padding: 0 24px;
+
+  background: rgba(6, 11, 14, 0.6);
+  border-bottom: 1px solid rgba(186, 210, 204, 0.12);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+
+  color: #edf1ed;
+  text-decoration: none;
+
+  font-family: var(--font-ui);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  line-height: 1;
+}
+
+.marca-principal {
+  color: #edf1ed;
+}
+
+.marca-acento {
+  color: #aebca4;
+}
+
+.estado-privacidad {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  color: rgba(188, 201, 195, 0.78);
+
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.punto-estado {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+
+  border: 1px solid rgba(198, 210, 204, 0.8);
+  border-radius: 50%;
+
+  background: rgba(146, 170, 140, 0.65);
+  box-shadow: 0 0 0 3px rgba(157, 182, 150, 0.08);
+}
+
+/* ==========================================================
+   04. PRESENTACIÓN Y CONTENIDO PRINCIPAL
+   ========================================================== */
+
+.principal {
+  display: flex;
+  flex-direction: column;
+
+  width: min(100%, 1600px);
+  height: calc(100% - var(--header-height));
+  min-height: 0;
+  margin-inline: auto;
+  padding: 22px clamp(24px, 3.2vw, 52px) 28px;
+}
+
+.introduccion {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+
+  min-height: 88px;
+  padding: 12px 4px 16px;
+}
+
+.introduccion-contenido {
+  width: 100%;
+  min-width: 0;
+}
+
+.etiqueta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin: 0 0 4px;
+
+  color: #a6b79a;
+
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.etiqueta::before {
+  width: 17px;
+  height: 1px;
+  flex: 0 0 17px;
+
+  content: "";
+
+  background: #8e9d79;
+}
+
+h1 {
+  margin: 0;
+
+  color: #e8ede8;
+
+  font-family: var(--font-ui);
+  font-size: clamp(23px, 2vw, 29px);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 1.12;
+}
+
+h1 span {
+  color: #b4c3a7;
+}
+
+.subtitulo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+
+  margin: 5px 0 0;
+
+  color: rgba(188, 200, 194, 0.72);
+
+  font-family: var(--font-text);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.subtitulo span {
+  color: #9ab3b5;
+}
+
+/* Distribución de los paneles de trabajo. */
+.espacio-trabajo {
+  display: grid;
+
+  grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.9fr);
+
+  align-items: stretch;
+  gap: 18px;
+
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+.panel {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+  padding: 18px;
+  overflow: hidden;
+
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+
+  background: var(--glass);
+
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+
+  backdrop-filter: blur(18px) saturate(0.85);
+  -webkit-backdrop-filter: blur(18px) saturate(0.85);
+}
+
+.panel::before {
+  position: absolute;
+  top: 0;
+  right: 18px;
+  left: 18px;
+
+  height: 1px;
+
+  content: "";
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(186, 210, 204, 0.16),
+    transparent
+  );
+
+  pointer-events: none;
+}
+
+.panel-documento {
+  padding: 14px;
+}
+
+.panel-resultado {
+  gap: 0;
+  padding: 12px;
+}
+
+/* ==========================================================
+   05. CABECERAS DE LOS PANELES
+   ========================================================== */
+
+.panel-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 47px;
+  padding: 0 0 12px;
+}
+
+.numero {
+  display: grid;
+  place-items: center;
+
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+
+  color: rgba(220, 228, 224, 0.92);
+
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.panel-cabecera > div:not(.acciones-resultado) {
+  min-width: 0;
+}
+
+.panel-cabecera h2 {
+  margin: 0;
+
+  color: #e4eae5;
+
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.panel-cabecera p {
+  margin: 3px 0 0;
+
+  color: var(--ink-mute);
+
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+/* ==========================================================
+   06. BOTONES Y ESTADOS INTERACTIVOS
+   ========================================================== */
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 11px;
+
+  color: var(--ink);
+
+  background: rgba(8, 14, 16, 0.42);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.boton:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.boton:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.boton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.boton-cobre {
+  color: #e5ebdd;
+
+  background: linear-gradient(
+    180deg,
+    rgba(91, 107, 73, 0.74),
+    rgba(62, 76, 51, 0.82)
+  );
+
+  border-color: rgba(150, 168, 122, 0.3);
+}
+
+.boton-cobre:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    rgba(107, 124, 86, 0.82),
+    rgba(74, 89, 60, 0.9)
+  );
+
+  border-color: rgba(169, 188, 138, 0.48);
+}
+
+.boton-historial {
+  width: 33px;
+  min-width: 33px;
+  min-height: 31px;
+  padding: 0;
+
+  font-size: 17px;
+}
+
+.boton-guardar,
+.boton-copiar {
+  min-height: 33px;
+  padding-inline: 11px;
+
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.boton-guardar {
+  color: #dce7d2;
+  border-color: rgba(140, 159, 116, 0.25);
+}
+
+.boton-copiar {
+  color: #b9d0d1;
+  border-color: rgba(122, 160, 168, 0.24);
+}
+
+/* ==========================================================
+   07. SELECCIÓN Y CARGA DEL DOCUMENTO PDF
+   ========================================================== */
+
+.panel-documento .panel-cabecera {
+  margin-bottom: 5px;
+}
+
+.zona-archivo {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+
+  flex: 0 0 auto;
+  min-height: 190px;
+  min-width: 0;
+  padding: 20px 12px;
+  overflow: hidden;
+
+  text-align: center;
+
+  border: 1px dashed rgba(170, 190, 184, 0.28);
+  border-radius: 7px;
+
+  background: rgba(8, 14, 16, 0.28);
+
+  cursor: pointer;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+/* Evita que los elementos internos se encojan. */
+.zona-archivo > * {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.zona-archivo:hover,
+.zona-archivo.arrastrando {
+  border-color: rgba(170, 190, 184, 0.56);
+  background: rgba(90, 110, 100, 0.12);
+}
+
+.icono-archivo {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+  align-self: center;
+
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+
+  margin: 0 0 3px;
+
+  color: rgba(210, 220, 216, 0.82);
+
+  border: 1px solid rgba(186, 210, 204, 0.2);
+  border-radius: 7px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  transform: none;
+}
+
+.icono-archivo svg {
+  display: block;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+}
+
+.zona-archivo h3 {
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+
+  color: #e6ebe6;
+
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  line-height: 1.4;
+
+  flex: 0 0 auto;
+}
+
+.zona-archivo > p {
+  max-width: 100%;
+  margin: 0;
+
+  color: var(--ink-dim);
+
+  font-family: var(--font-text);
+  font-size: 11px;
+  line-height: 1.5;
+
+  flex: 0 0 auto;
+}
+
+.zona-archivo .nota-privacidad {
+  margin-top: 4px;
+
+  color: var(--ink-mute);
+
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.zona-archivo #botonSeleccionar {
+  max-width: 100%;
+  margin-top: 3px;
+
+  flex: 0 0 auto;
+}
+
+/* Archivo seleccionado. */
+.archivo-seleccionado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+  margin-top: 11px;
+  padding: 10px;
+
+  border: 1px solid var(--line);
+  border-radius: 7px;
+
+  background: rgba(8, 14, 16, 0.36);
+}
+
+.archivo-tipo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+  padding: 6px 7px;
+
+  color: #d7e0c8;
+
+  background: var(--olive-fill);
+  border: 1px solid rgba(140, 156, 112, 0.28);
+  border-radius: 4px;
+
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+#nombreArchivo {
+  min-width: 0;
+  overflow: hidden;
+
+  color: #d9e0da;
+
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   08. SELECTOR DE PÁGINAS
+   ========================================================== */
+
+.selector-paginas {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
+
+  flex: 0 0 auto;
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.selector-paginas label {
+  color: var(--ink-dim);
+
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.selector-paginas select,
+.selector-paginas input {
+  width: 100%;
+  min-width: 0;
+  height: 35px;
+  padding: 0 10px;
+
+  color: var(--ink);
+  background: var(--field);
+
+  border: 1px solid var(--line);
+  border-radius: 5px;
+
+  font-family: var(--font-text);
+  font-size: 12px;
+}
+
+.selector-paginas select:focus,
+.selector-paginas input:focus {
+  border-color: var(--line-strong);
+}
+
+.selector-paginas p {
+  margin: 0;
+
+  color: var(--ink-mute);
+
+  font-family: var(--font-text);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+#botonExtraerPaginas {
+  align-self: stretch;
+  min-height: 38px;
+  margin-top: 2px;
+
+  font-size: 12px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================
+   09. CABECERA Y ACCIONES DEL RESULTADO
+   ========================================================== */
+
+.panel-resultado > .panel-cabecera {
+  display: grid;
+
+  grid-template-columns: 36px minmax(120px, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+
+  min-height: 47px;
+  padding: 0 0 10px;
+}
+
+.acciones-resultado {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  min-width: 0;
+}
+
+.acciones-resultado .boton {
+  flex: 0 0 auto;
+}
+
+/* ==========================================================
+   10. BÚSQUEDA Y REEMPLAZO
+   ========================================================== */
+
+.buscador-texto,
+.reemplazo-texto {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 7px;
+
+  min-width: 0;
+  padding: 5px 0;
+}
+
+.buscador-texto {
+  border-top: 1px solid rgba(186, 210, 204, 0.06);
+}
+
+.reemplazo-texto {
+  padding-bottom: 10px;
+}
+
+#buscarTexto,
+#reemplazarTexto {
+  display: block;
+
+  flex: 1 1 100px;
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+
+  color: var(--ink);
+  background: rgba(7, 12, 14, 0.56);
+
+  border: 1px solid var(--line);
+  border-radius: 5px;
+
+  font-family: var(--font-text);
+  font-size: 12px;
+
+  outline: none;
+}
+
+#buscarTexto::placeholder,
+#reemplazarTexto::placeholder {
+  color: var(--ink-mute);
+}
+
+#buscarTexto:focus,
+#reemplazarTexto:focus {
+  border-color: rgba(154, 186, 176, 0.48);
+  background: rgba(7, 12, 14, 0.76);
+}
+
+#resultadoBusqueda {
+  flex: 0 0 auto;
+  min-width: 32px;
+
+  color: var(--ink-dim);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-align: center;
+}
+
+.boton-busqueda {
+  flex: 0 0 30px;
+
+  width: 30px;
+  min-width: 30px;
+  min-height: 31px;
+  padding: 0;
+
+  font-size: 13px;
+}
+
+.boton-reemplazo {
+  flex: 0 0 auto;
+  min-height: 31px;
+  padding-inline: 10px;
+
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   11. EDITOR Y CAPA DE RESALTADO
+   ========================================================== */
+
+/* Contenedor del editor. */
+.area-texto {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(5, 10, 13, 0.58);
+}
+
+/*
+ * Propiedades tipográficas compartidas para conservar
+ * la alineación entre el texto editable y los resaltados.
+ */
+#textoResaltado,
+#textoExtraido {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+  box-sizing: border-box;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  margin: 0;
+  padding: 17px 18px;
+
+  border: 0;
+  border-radius: 0;
+
+  font-family: var(--font-text);
+  font-size: calc(13px * var(--zoom));
+  font-weight: 400;
+  line-height: calc(1.72 * var(--zoom));
+  letter-spacing: 0.01em;
+
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  tab-size: 4;
+
+  text-align: left;
+  text-indent: 0;
+  text-transform: none;
+  font-kerning: none;
+}
+
+/* Capa visual de coincidencias. */
+#textoResaltado {
+  z-index: 2;
+
+  overflow: hidden;
+
+  color: transparent;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* Coincidencias normales y coincidencia activa. */
+#textoResaltado mark {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  background: rgba(133, 157, 103, 0.28);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(176, 194, 132, 0.12);
+}
+
+#textoResaltado mark.activa {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  background: rgba(176, 194, 132, 0.42);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(205, 220, 166, 0.24);
+}
+
+/* Editor real: editable, visible y seleccionable. */
+#textoExtraido {
+  z-index: 1;
+
+  outline: none;
+  box-shadow: none;
+  resize: none;
+
+  color: #d5ddd6;
+  -webkit-text-fill-color: #d5ddd6;
+  background: transparent;
+  caret-color: #c9e0d6;
+
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(110, 130, 128, 0.35) transparent;
+}
+
+#textoExtraido::selection {
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  background: rgba(93, 151, 139, 0.65);
+}
+
+#textoExtraido::placeholder {
+  color: var(--ink-mute);
+  -webkit-text-fill-color: var(--ink-mute);
+}
+
+#textoExtraido:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#textoExtraido:disabled {
+  cursor: default;
+}
+
+/* ==========================================================
+   12. EXPORTACIÓN — TARJETAS TXT Y MARKDOWN
+   ========================================================== */
+
+.exportacion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+  margin-top: 16px;
+}
+
+.exportacion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  min-width: 0;
+}
+
+.exportacion-etiqueta,
+.exportacion-descripcion {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.exportacion-etiqueta {
+  color: var(--ink-dim);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+}
+
+.exportacion-descripcion {
+  color: var(--ink-mute);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  text-align: right;
+}
+
+.exportacion-tarjetas {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.tarjeta-exportacion {
+  display: grid;
+
+  grid-template-columns: 34px minmax(0, 1fr) 10px;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 76px;
+  padding: 10px;
+
+  color: var(--ink);
+
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+
+  background: var(--glass-soft);
+
+  font-family: var(--font-ui);
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.tarjeta-exportacion-txt {
+  border-color: rgba(132, 147, 114, 0.38);
+}
+
+.tarjeta-exportacion-md {
+  border-color: rgba(122, 160, 168, 0.38);
+}
+
+.tarjeta-exportacion:not(:disabled):hover {
+  transform: translateY(-2px);
+  background: rgba(30, 40, 40, 0.9);
+}
+
+.tarjeta-exportacion-txt:not(:disabled):hover {
+  border-color: var(--olive);
+}
+
+.tarjeta-exportacion-md:not(:disabled):hover {
+  border-color: var(--cyan);
+}
+
+.tarjeta-exportacion:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.tarjeta-exportacion:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tarjeta-exportacion-icono {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  min-width: 0;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+
+  background: rgba(5, 11, 14, 0.48);
+
+  color: var(--olive);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: -0.5px;
+}
+
+.tarjeta-exportacion-md .tarjeta-exportacion-icono {
+  color: var(--cyan);
+}
+
+.tarjeta-exportacion-contenido {
+  display: flex;
+  flex: initial;
+  flex-direction: column;
+  gap: 4px;
+
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tarjeta-exportacion-titulo,
+.tarjeta-exportacion-detalle {
+  display: block;
+
+  max-width: 100%;
+
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.tarjeta-exportacion-titulo {
+  color: var(--ink);
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.tarjeta-exportacion-detalle {
+  color: var(--ink-dim);
+
+  font-family: var(--font-text);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.tarjeta-exportacion-flecha {
+  align-self: flex-start;
+  justify-self: end;
+
+  color: var(--ink-dim);
+
+  font-size: 14px;
+}
+
+/* ==========================================================
+   13. ESTADO DEL RESULTADO
+   ========================================================== */
+
+.pie-resultado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 33px;
+  padding: 8px 3px 0;
+
+  color: var(--ink-mute);
+
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+}
+
+.pie-resultado > span:first-child {
+  min-width: 0;
+}
+
+.pie-resultado > span:last-child {
+  flex: 0 0 auto;
+
+  color: rgba(168, 180, 176, 0.62);
+  letter-spacing: 0.14em;
+}
+
+/* ==========================================================
+   14. RESPONSIVE — TABLET
+   ========================================================== */
+
+@media (max-width: 1000px) {
+  :root {
+    --header-height: 55px;
+  }
+
+  .barra-superior {
+    padding-inline: 18px;
+  }
+
+  .principal {
+    padding-inline: 20px;
+    padding-bottom: 18px;
+  }
+
+  .introduccion {
+    min-height: 78px;
+  }
+
+  .espacio-trabajo {
+    grid-template-columns: minmax(245px, 0.82fr) minmax(0, 1.6fr);
+
+    gap: 10px;
+  }
+
+  .panel-documento {
+    padding: 11px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .panel-resultado {
+    padding: 10px;
+  }
+
+  /* En ventanas estrechas, cada formato dispone de todo el ancho. */
+  .exportacion-tarjetas {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .tarjeta-exportacion {
+    min-height: 66px;
+    grid-template-columns: 36px minmax(0, 1fr) 12px;
+  }
+
+  .panel-resultado > .panel-cabecera {
+    grid-template-columns: 32px minmax(90px, 1fr);
+    column-gap: 9px;
+    row-gap: 8px;
+  }
+
+  .panel-resultado > .panel-cabecera > .numero {
+    width: 32px;
+    height: 32px;
+  }
+
+  .panel-resultado .acciones-resultado {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .acciones-resultado .boton {
+    min-height: 29px;
+  }
+
+  .buscador-texto,
+  .reemplazo-texto {
+    flex-wrap: wrap;
+  }
+
+  #buscarTexto,
+  #reemplazarTexto {
+    flex: 1 1 140px;
+  }
+}
+
+/* ==========================================================
+   15. RESPONSIVE — MÓVIL
+   ========================================================== */
+
+@media (max-width: 760px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+  }
+
+  body {
+    overflow: auto;
+  }
+
+  body::before {
+    position: fixed;
+    background-position:
+      center,
+      center,
+      center 30%;
+  }
+
+  .barra-superior {
+    position: sticky;
+    top: 0;
+
+    height: 55px;
+    min-height: 55px;
+    padding-inline: 15px;
+  }
+
+  .marca {
+    font-size: 19px;
+    letter-spacing: 0.23em;
+  }
+
+  .estado-privacidad {
+    gap: 7px;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .principal {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 0 10px 14px;
+  }
+
+  .introduccion {
+    min-height: 84px;
+    padding: 14px 3px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .subtitulo {
+    font-size: 11px;
+  }
+
+  .espacio-trabajo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .panel-documento {
+    min-height: 0;
+    padding: 13px;
+  }
+
+  .zona-archivo {
+    min-height: 190px;
+  }
+
+  .panel-resultado {
+    min-height: 620px;
+    padding: 11px;
+  }
+
+  .panel-resultado > .panel-cabecera {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .panel-resultado .acciones-resultado {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-top: 2px;
+  }
+
+  .buscador-texto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  #buscarTexto {
+    flex: 1 1 calc(100% - 1px);
+  }
+
+  #reemplazarTexto {
+    flex: 1 1 100%;
+  }
+
+  .reemplazo-texto {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .area-texto {
+    flex: 1 1 390px;
+    min-height: 390px;
+  }
+
+  .exportacion-tarjetas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #textoResaltado,
+  #textoExtraido {
+    padding: 14px;
+    font-size: calc(12px * var(--zoom));
+  }
+
+  .pie-resultado {
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================================
+   16. RESPONSIVE — MÓVILES ESTRECHOS
+   ========================================================== */
+
+@media (max-width: 390px) {
+  .estado-privacidad {
+    max-width: 150px;
+    white-space: normal;
+    text-align: right;
+    line-height: 1.3;
+  }
+
+  .panel-cabecera h2 {
+    font-size: 14px;
+    letter-spacing: 0.12em;
+  }
+
+  .panel-cabecera p {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .panel-resultado .acciones-resultado {
+    gap: 5px;
+  }
+
+  .boton-guardar,
+  .boton-copiar {
+    padding-inline: 8px;
+    font-size: 10px;
+  }
+
+  .boton-reemplazo {
+    padding-inline: 8px;
+    font-size: 10px;
+  }
+
+  .pie-resultado {
+    font-size: 9px;
+  }
+}
+
+/* ==========================================================
+   17. RESPONSIVE — TARJETAS DE EXPORTACIÓN ESTRECHAS
+   Se conserva el breakpoint original de 400 px.
+   ========================================================== */
+
+@media (max-width: 400px) {
+  .exportacion-tarjetas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tarjeta-exportacion {
+    grid-template-columns: 38px minmax(0, 1fr) 12px;
+  }
+
+  .tarjeta-exportacion-icono {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ==========================================================
+   18. ACCESIBILIDAD — MOVIMIENTO REDUCIDO
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Estado de cancelación del proceso PDF/OCR. */
+.boton-cancelar-ocr {
+  margin-top: 0.65rem;
+}
+.boton-cancelar-ocr[hidden] {
+  display: none;
+}

@@ -1,0 +1,22 @@
+# Dependencias y salidas de Electron
+node_modules/
+dist/
+release/
+out/
+coverage/
+
+# Registros y archivos del sistema
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Variables de entorno y secretos locales
+.env
+.env.*
+!.env.example
+
+# Archivos de respaldo del editor
+*~
+*.swp
+*.swo

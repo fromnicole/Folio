@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#191b18" />
+    <meta
+      name="description"
+      content="Extrae texto de PDF, busca y reemplaza palabras y exporta el resultado."
+    />
+
+    <title>Folio — Extraer texto de PDF</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="node_modules/tesseract.js/dist/tesseract.min.js"></script>
+    <script src="src/script.js" type="module"></script>
+  </head>
+
+  <body>
+    <header class="barra-superior">
+      <a class="marca" href="#" aria-label="Folio inicio">
+        <span class="marca-principal">FOLIO</span>
+      </a>
+
+      <div class="estado-privacidad">
+        <span class="punto-estado" aria-hidden="true"></span>
+        <span>Procesamiento local</span>
+      </div>
+    </header>
+
+    <main class="principal">
+      <section class="introduccion">
+        <div class="introduccion-contenido">
+          <p class="etiqueta">PDF A TEXTO</p>
+
+          <h1>Extrae texto de tus <span>PDF.</span></h1>
+
+          <p class="subtitulo">
+            Busca y reemplaza texto, copia el resultado o expórtalo en TXT o
+            Markdown.
+          </p>
+        </div>
+      </section>
+
+      <section class="espacio-trabajo" aria-label="Herramienta de extracción">
+        <article class="panel panel-documento">
+          <div class="panel-cabecera">
+            <span class="numero">01</span>
+
+            <div>
+              <h2>Documento</h2>
+              <p>Elige un PDF para empezar</p>
+            </div>
+          </div>
+
+          <div class="zona-archivo" id="zonaArchivo">
+            <div class="icono-archivo" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="30"
+                height="30"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10z"
+                />
+                <path d="M13 3v7h7" />
+                <path d="M12 17V12" />
+                <path d="m9.5 14.5 2.5-2.5 2.5 2.5" />
+              </svg>
+            </div>
+
+            <h3>Arrastra tu PDF</h3>
+            <p>o selecciónalo desde tu equipo</p>
+
+            <input
+              type="file"
+              id="archivoPDF"
+              accept=".pdf,application/pdf"
+              hidden
+            />
+
+            <button
+              type="button"
+              class="boton boton-cobre"
+              id="botonSeleccionar"
+            >
+              Seleccionar archivo
+            </button>
+
+            <p class="nota-privacidad">
+              El archivo se procesa en tu dispositivo.
+            </p>
+          </div>
+
+          <div class="archivo-seleccionado" id="estadoArchivo">
+            <span class="archivo-tipo">PDF</span>
+            <span id="nombreArchivo">Ningún archivo seleccionado</span>
+          </div>
+
+          <div class="selector-paginas" id="selectorPaginas" hidden>
+            <label for="rangoPaginas">Páginas que deseas extraer</label>
+
+            <select id="modoPaginas">
+              <option value="todas">Todas las páginas</option>
+              <option value="rango">Rango de páginas</option>
+              <option value="especificas">Páginas específicas</option>
+            </select>
+
+            <input
+              type="text"
+              id="rangoPaginas"
+              placeholder="Ej.: 2-5"
+              aria-label="Rango o páginas que deseas extraer"
+              hidden
+            />
+
+            <p id="infoPaginas">Indica qué páginas quieres extraer.</p>
+
+            <button
+              type="button"
+              id="botonExtraerPaginas"
+              class="boton boton-cobre"
+            >
+              Extraer selección
+            </button>
+            <button
+              type="button"
+              id="botonCancelarOCR"
+              class="boton boton-cancelar-ocr"
+              hidden
+            >
+              Cancelar proceso
+            </button>
+          </div>
+
+          <section class="exportacion" aria-label="Opciones de exportación">
+            <div class="exportacion-cabecera">
+              <span class="exportacion-etiqueta">EXPORTAR</span>
+              <span class="exportacion-descripcion">GUARDAR EL TEXTO</span>
+            </div>
+
+            <div class="exportacion-tarjetas">
+              <button
+                type="button"
+                class="tarjeta-exportacion tarjeta-exportacion-txt"
+                id="botonExportarTXT"
+                disabled
+              >
+                <span class="tarjeta-exportacion-icono" aria-hidden="true">
+                  TXT
+                </span>
+                <span class="tarjeta-exportacion-contenido">
+                  <span class="tarjeta-exportacion-titulo">Texto plano</span>
+                  <span class="tarjeta-exportacion-detalle">
+                    Archivo .txt
+                  </span>
+                </span>
+                <span class="tarjeta-exportacion-flecha" aria-hidden="true">
+                  ↗
+                </span>
+              </button>
+
+              <button
+                type="button"
+                class="tarjeta-exportacion tarjeta-exportacion-md"
+                id="botonExportarMarkdown"
+                disabled
+              >
+                <span class="tarjeta-exportacion-icono" aria-hidden="true">
+                  MD
+                </span>
+                <span class="tarjeta-exportacion-contenido">
+                  <span class="tarjeta-exportacion-titulo">Markdown</span>
+                  <span class="tarjeta-exportacion-detalle"> Archivo .md </span>
+                </span>
+                <span class="tarjeta-exportacion-flecha" aria-hidden="true">
+                  ↗
+                </span>
+              </button>
+            </div>
+          </section>
+        </article>
+
+        <article class="panel panel-resultado">
+          <div class="panel-cabecera">
+            <span class="numero">02</span>
+
+            <div>
+              <h2>Texto extraído</h2>
+              <p id="contadorTexto">0 caracteres</p>
+            </div>
+
+            <div class="acciones-resultado">
+              <button
+                type="button"
+                class="boton boton-historial"
+                id="botonDeshacer"
+                title="Deshacer (Ctrl+Z)"
+                aria-label="Deshacer"
+                disabled
+              >
+                ↶
+              </button>
+
+              <button
+                type="button"
+                class="boton boton-historial"
+                id="botonRehacer"
+                title="Rehacer (Ctrl+Y)"
+                aria-label="Rehacer"
+                disabled
+              >
+                ↷
+              </button>
+
+              <button
+                type="button"
+                class="boton boton-copiar"
+                id="botonCopiar"
+                disabled
+              >
+                Copiar texto
+              </button>
+            </div>
+          </div>
+
+          <div class="buscador-texto">
+            <input
+              type="search"
+              id="buscarTexto"
+              placeholder="Buscar en el texto..."
+              aria-label="Buscar palabras en el texto extraído"
+              autocomplete="off"
+            />
+
+            <span id="resultadoBusqueda" aria-live="polite"></span>
+
+            <button
+              type="button"
+              id="busquedaAnterior"
+              class="boton boton-busqueda"
+              aria-label="Coincidencia anterior"
+              title="Coincidencia anterior"
+              disabled
+            >
+              ↑
+            </button>
+
+            <button
+              type="button"
+              id="busquedaSiguiente"
+              class="boton boton-busqueda"
+              aria-label="Coincidencia siguiente"
+              title="Coincidencia siguiente"
+              disabled
+            >
+              ↓
+            </button>
+          </div>
+
+          <div class="reemplazo-texto">
+            <input
+              type="text"
+              id="reemplazarTexto"
+              placeholder="Reemplazar por..."
+              aria-label="Texto de reemplazo"
+              autocomplete="off"
+            />
+
+            <button
+              type="button"
+              id="botonReemplazar"
+              class="boton boton-reemplazo"
+              disabled
+            >
+              Reemplazar
+            </button>
+
+            <button
+              type="button"
+              id="botonReemplazarTodo"
+              class="boton boton-reemplazo"
+              disabled
+            >
+              Reemplazar todo
+            </button>
+          </div>
+
+          <div class="area-texto">
+            <div id="textoResaltado" aria-hidden="true"></div>
+
+            <textarea
+              id="textoExtraido"
+              placeholder="El texto aparecerá aquí..."
+              aria-label="Texto extraído del PDF"
+              spellcheck="false"
+            ></textarea>
+          </div>
+
+          <div class="pie-resultado">
+            <span id="estadoExtraccion">Selecciona un PDF</span>
+            <span>PDF / TXT</span>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
