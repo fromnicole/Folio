@@ -29,6 +29,35 @@ function crearVentana() {
   });
 }
 
+// Abrir el selector nativo de archivos PDF.
+ipcMain.handle("abrir-pdf", async () => {
+  const resultado = await dialog.showOpenDialog(ventanaPrincipal, {
+    title: "Seleccionar PDF",
+    buttonLabel: "Abrir",
+    properties: ["openFile"],
+    filters: [
+      {
+        name: "Documentos PDF",
+        extensions: ["pdf"],
+      },
+    ],
+  });
+
+  if (resultado.canceled || !resultado.filePaths.length) {
+    return { cancelado: true };
+  }
+
+  const rutaArchivo = resultado.filePaths[0];
+  const datos = await fs.readFile(rutaArchivo);
+
+  return {
+    cancelado: false,
+    nombre: path.basename(rutaArchivo),
+    datos: new Uint8Array(datos),
+  };
+});
+
+// Guardar el texto extraído.
 ipcMain.handle("guardar-texto", async (event, datos = {}) => {
   const {
     contenido = "",

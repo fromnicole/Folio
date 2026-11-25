@@ -4,7 +4,6 @@ import { crearOCR } from "./ocr.js";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "../pdfjs/pdf.worker.mjs";
 export function inicializarPDF(app) {
   const {
-    archivoPDF,
     botonSeleccionar,
     nombreArchivo,
     zonaArchivo,
@@ -45,20 +44,26 @@ export function inicializarPDF(app) {
     botonExtraerPaginas.disabled = false;
     botonCancelarOCR.hidden = true;
   });
-  // Abrir el selector de archivos.
-  botonSeleccionar.addEventListener("click", () => {
-    archivoPDF.click();
-  });
 
-  // Procesar el archivo seleccionado.
-  archivoPDF.addEventListener("change", async () => {
-    const archivo = archivoPDF.files[0];
+  // Abrir el selector nativo de Electron.
+  botonSeleccionar.addEventListener("click", async () => {
+    if (botonSeleccionar.disabled) return;
 
-    if (archivo) {
+    try {
+      const resultado = await window.folio.abrirPDF();
+
+      if (!resultado || resultado.cancelado) return;
+
+      const archivo = new File([resultado.datos], resultado.nombre, {
+        type: "application/pdf",
+      });
+
       await prepararDocumento(archivo);
-    }
+    } catch (error) {
+      console.error("Error al seleccionar el PDF:", error);
 
-    archivoPDF.value = "";
+      estadoExtraccion.textContent = `No se pudo abrir el PDF: ${error.message || error}`;
+    }
   });
 
   // Indicar visualmente que la zona acepta un archivo arrastrado.
